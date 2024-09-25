@@ -1,12 +1,3 @@
-[package]
-name = "egui_alignments"
-version = "0.1.0"
-edition = "2021"
-description = "Simple alignment tools for egui"
-readme = "../../README.md"
-keywords = ["egui", "alignment", "layout"]
-homepage = "https://github.com/a-littlebit/egui_alignments"
-repository = "https://github.com/a-littlebit/egui_alignments"
-
-[dependencies]
-egui = "0.28.1"
+[workspace]
+members = ["crates/egui_alignments", "examples/alignments"]
+license = "MIT OR Apache-2.0"
