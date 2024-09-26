@@ -17,19 +17,20 @@ fn main() -> eframe::Result {
         egui::CentralPanel::default().show(ctx, |ui| {
             Label::new(WidgetText::from("My egui alignments").heading()).top(ui);
             
-            ui.horizontal(|ui| {
-                Label::new("Try resize the window").left(ui);
-                Label::new("Buttons should always be centered").right(ui);
-            });
-            
             center_horizontal(ui, |ui| {
-                for i in 1..=10 {
-                    if Button::new(format!("Button {}", i))
-                        .ui(ui)
-                        .clicked() {
+                Label::new("Try to resize the window and see").left(ui);
+                Label::new("Buttons should always be centered").right(ui);
+                
+                center_horizontal(ui, |ui| {
+                    for i in 1..=5 {
+                        if Button::new(format!("Button {}", i))
+                            .ui(ui)
+                            .clicked()
+                        {
                             clicked_button = Some(i);
                         }
-                }
+                    }
+                });
             });
             
             if let Some(button) = clicked_button {
