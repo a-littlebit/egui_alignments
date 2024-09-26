@@ -7,3 +7,4 @@ edition = "2021"
 eframe = "0.28.1"
 egui = "0.28.1"
 egui_alignments = { path = "../../crates/egui_alignments" }
+egui_extras = { version = "0.28.1", features = ["all_loaders"] }
