@@ -324,11 +324,10 @@ impl<T: Aligner> WidgetAligner<T> {
             Sense::hover(),
         );
 
-        // if the content changed size or was hidden, update the memorized size request a repaint
+        // if the content changed size or not memorized, update the memorized size
         let new_size = child_ui.min_size();
         if new_size != content_size || !memorized {
             ui.ctx().data_mut(|w| w.insert_temp(id, new_size));
-            ui.ctx().request_repaint();
         }
 
         InnerResponse { inner, response }
