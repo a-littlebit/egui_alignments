@@ -10,4 +10,4 @@ repository = "https://github.com/a-littlebit/egui_alignments"
 license.workspace = true
 
 [dependencies]
-egui = "0.28.1"
+egui = "0.29.0"
