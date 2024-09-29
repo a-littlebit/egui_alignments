@@ -138,7 +138,7 @@ dependencies = [
 
 [[package]]
 name = "alignments"
-version = "0.1.0"
+version = "0.2.3"
 dependencies = [
  "eframe",
  "egui",
@@ -725,6 +725,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "containers"
+version = "0.2.3"
+dependencies = [
+ "eframe",
+ "egui",
+ "egui_alignments",
+ "egui_extras",
+]
+
+[[package]]
 name = "core-foundation"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -975,7 +985,7 @@ dependencies = [
 
 [[package]]
 name = "egui_alignments"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "egui",
 ]

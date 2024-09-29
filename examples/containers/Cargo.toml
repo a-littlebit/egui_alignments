@@ -1,5 +1,5 @@
 [package]
-name = "alignments"
+name = "containers"
 license.workspace = true
 version.workspace = true
 edition.workspace = true

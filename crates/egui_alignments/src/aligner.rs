@@ -1,27 +1,30 @@
-use egui::{Align, Align2, Id, InnerResponse, Layout, Margin, Pos2, Rect, Sense, Ui, Vec2};
+use egui::{Align, Align2, Id, InnerResponse, Layout, Margin, Pos2, Rect, Sense, Ui, UiBuilder, Vec2};
+
+use crate::expand_layout_rect;
 
 /// Represents an alignment strategy.
 /// You can directly use `egui::Align2` or closure `FnOnce(egui::Vec2, egui::Rect) -> egui::Rect`
 /// to align the contents.
 /// Or you can implement your own aligner.
 pub trait Aligner {
-    fn align(self, item_size: Vec2, available_rect: Rect) -> Rect;
+    fn align(self, item_size: Vec2, bounds: Rect) -> Rect;
 }
 
 impl Aligner for egui::Align2 {
-    fn align(self, item_size: Vec2, available_rect: Rect) -> Rect {
-        self.align_size_within_rect(item_size, available_rect)
+    fn align(self, item_size: Vec2, bounds: Rect) -> Rect {
+        self.align_size_within_rect(item_size, bounds)
     }
 }
 
 impl<T> Aligner for T
 where T: FnOnce(Vec2, Rect) -> Rect {
-    fn align(self, item_size: Vec2, available_rect: Rect) -> Rect {
-        self(item_size, available_rect)
+    fn align(self, item_size: Vec2, bounds: Rect) -> Rect {
+        self(item_size, bounds)
     }
 }
 
 /// Determines how [`WidgetAligner`] allocate space for the aligned contents.
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum AllocateType {
     /// Allocate no space.
     None,
@@ -42,6 +45,7 @@ pub enum AllocateType {
 }
 
 /// The bounds in which its contents will be aligned.
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Bounds {
     /// Align in Ui's next widget position with the given size.
     AvailableRect(Vec2),
@@ -253,11 +257,9 @@ impl<T: Aligner> WidgetAligner<T> {
         // calculate the bounds
         let bounds = match self.bounds {
             Bounds::AvailableRect(size) => {
-                let available_rect = ui.available_rect_before_wrap();
-                layout.align_size_within_rect(
-                    size.min(available_rect.size()),
-                    available_rect
-                )
+                ui.new_child(UiBuilder::new())
+                    .allocate_space(size.min(ui.available_size()))
+                    .1
             },
             Bounds::MaxRect(margin) => {
                 ui.max_rect() - margin
@@ -274,30 +276,27 @@ impl<T: Aligner> WidgetAligner<T> {
                 bounds.size()
             });
 
-        // align within available rect
-        let mut content_rect = self.align.align(content_size, bounds);
-        // extend child ui to allow contents to become larger than the memorized
-        if layout.horizontal_placement() == Align::Max {
-            content_rect.min.x = bounds.min.x;
-        } else {
-            content_rect.max.x = bounds.max.x;
-        }
-        if layout.vertical_align() == Align::Max {
-            content_rect.min.y = bounds.min.y;
-        } else {
-            content_rect.max.y = bounds.max.y;
-        }
-        // create child ui
-        let mut child_ui = ui.child_ui(
-            content_rect, 
-            layout, 
-            None
+        // calc the content rect
+        let content_rect = expand_layout_rect(
+            self.align.align(content_size, bounds),
+            bounds.size(),
+            &layout
         );
-
-        // hide the child ui if we didn't memorize the size
-        if !memorized {
-            child_ui.set_invisible();
-        }
+        
+        // create child ui
+        let mut child_ui = ui.new_child({
+            let builder = UiBuilder::new()
+                .max_rect(content_rect)
+                .layout(layout);
+            
+            if memorized {
+                builder
+            } else {
+                // no size memorized, set the pass to sizing pass
+                ui.ctx().request_discard("new WidgetAligner");
+                builder.sizing_pass().invisible()
+            }
+        });
 
         // paint the contents
         let inner = add_contents(&mut child_ui);
@@ -341,9 +340,9 @@ impl<T: Aligner> WidgetAligner<T> {
         add_contents: impl FnOnce(&mut Ui) -> R
     ) -> InnerResponse<R> {
         let layout = if ui.layout().prefer_right_to_left() {
-            Layout::right_to_left(Align::TOP)
+            Layout::right_to_left(Align::Center)
         } else {
-            Layout::left_to_right(Align::TOP)
+            Layout::left_to_right(Align::Center)
         }
         .with_main_wrap(false);
     
@@ -359,9 +358,9 @@ impl<T: Aligner> WidgetAligner<T> {
         add_contents: impl FnOnce(&mut Ui) -> R
     ) -> InnerResponse<R> {
         let layout = if ui.layout().prefer_right_to_left() {
-            Layout::right_to_left(Align::TOP)
+            Layout::right_to_left(Align::Center)
         } else {
-            Layout::left_to_right(Align::TOP)
+            Layout::left_to_right(Align::Center)
         }
         .with_main_wrap(true);
 
@@ -407,11 +406,12 @@ pub fn center_horizontal_wrapped<R>(
     add_contents: impl FnOnce(&mut Ui) -> R
 ) -> InnerResponse<R> {
     let layout = if ui.layout().prefer_right_to_left() {
-        Layout::right_to_left(Align::TOP)
+        Layout::right_to_left(Align::Center)
     } else {
-        Layout::left_to_right(Align::TOP)
+        Layout::left_to_right(Align::Center)
     }
     .with_main_wrap(true);
+
     WidgetAligner::center()
         .layout(layout)
         .show(ui, add_contents)
@@ -457,6 +457,7 @@ pub fn top_horizontal_wrapped<R>(
         Layout::left_to_right(Align::TOP)
     }
     .with_main_wrap(true);
+
     WidgetAligner::from_align(Align2::CENTER_TOP)
         .layout(layout)
         .show(ui, add_contents)
@@ -482,6 +483,7 @@ pub fn bottom_horizontal<R>(
     } else {
         Layout::left_to_right(Align::BOTTOM)
     };
+    
     WidgetAligner::from_align(egui::Align2::CENTER_BOTTOM)
         .layout(layout)
         .show(ui, add_contents)
@@ -499,6 +501,7 @@ pub fn bottom_horizontal_wrapped<R>(
         Layout::left_to_right(Align::BOTTOM)
     }
     .with_main_wrap(true);
+
     WidgetAligner::from_align(egui::Align2::CENTER_BOTTOM)
         .layout(layout)
         .show(ui, add_contents)
@@ -528,8 +531,9 @@ pub fn left_horizontal_wrapped<R>(
     ui: &mut Ui,
     add_contents: impl FnOnce(&mut Ui) -> R
 ) -> InnerResponse<R> {
-    let layout = Layout::left_to_right(Align::TOP)
+    let layout = Layout::left_to_right(Align::Center)
         .with_main_wrap(true);
+    
     WidgetAligner::from_align(egui::Align2::LEFT_CENTER)
         .layout(layout)
         .show(ui, add_contents)
@@ -561,7 +565,7 @@ pub fn right_horizontal_wrapped<R>(
     ui: &mut Ui,
     add_contents: impl FnOnce(&mut Ui) -> R
 ) -> InnerResponse<R> {
-    let layout = Layout::right_to_left(Align::TOP)
+    let layout = Layout::right_to_left(Align::Center)
         .with_main_wrap(true);
     WidgetAligner::from_align(Align2::RIGHT_CENTER)
         .layout(layout)

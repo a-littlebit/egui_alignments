@@ -2,6 +2,10 @@
 
 All notable changes to this crate will be documented in this file.
 
+## 0.2.3 - 2024-09-30
+
+- Add `container` module with container `Row` and `Column`
+
 ## 0.2.2 - 2024-09-28
 
 - Update egui to 0.29.0

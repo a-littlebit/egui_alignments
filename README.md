@@ -58,3 +58,34 @@ center_vertical(ui, |ui| {
     }
 })
 ```
+
+### Use containers
+
+Sometimes nested calls to alignment functions like `center_horizontal`, `top_vertical`, ...
+may cause layout confusion due to interaction between inner and outer layouts.
+
+To prevent inner layouts from disrupting the outer ones, you may use containers for inner layouts.
+
+Containers only cares about its inner alignments and act like a simple widget in the outer layout.
+
+The following is an example usage of containers.
+
+```rust
+use egui::Align;
+use egui_alignments::{center_horizontal, column, row};
+
+center_horizontal(ui, |ui| {
+    ui.image("path/to/left/image");
+    column(ui, Align::Center, |ui| {
+        ui.label("top of right text");
+        row(ui, Align::Center, |ui| {
+            ui.label("left");
+            ui.label("middle");
+            ui.label("right");
+        });
+        ui.label("bottom of right text");
+    });
+});
+```
+
+This will show an image on the left, and a column of text on the right which contains a row of three labels in the middle.
