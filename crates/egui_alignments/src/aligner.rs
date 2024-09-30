@@ -1,6 +1,6 @@
 use egui::{Align, Align2, Id, InnerResponse, Layout, Margin, Pos2, Rect, Sense, Ui, UiBuilder, Vec2};
 
-use crate::expand_layout_rect;
+use crate::resize_layout_rect;
 
 /// Represents an alignment strategy.
 /// You can directly use `egui::Align2` or closure `FnOnce(egui::Vec2, egui::Rect) -> egui::Rect`
@@ -277,7 +277,7 @@ impl<T: Aligner> WidgetAligner<T> {
             });
 
         // calc the content rect
-        let content_rect = expand_layout_rect(
+        let content_rect = resize_layout_rect(
             self.align.align(content_size, bounds),
             bounds.size(),
             &layout

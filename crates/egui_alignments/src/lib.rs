@@ -106,9 +106,9 @@ pub use container::*;
 
 use egui::{Align, Direction, Layout, Rect, Vec2};
 
-// expand layout rect without moving the inner content.
+// resize layout rect without moving the inner content.
 // this is useful for layouts that contain growable widgets like `ScrollArea`.
-pub(crate) fn expand_layout_rect(rect: Rect, size: Vec2, layout: &Layout) -> Rect {
+pub(crate) fn resize_layout_rect(rect: Rect, size: Vec2, layout: &Layout) -> Rect {
     let mut new_rect = rect;
     let x_expand = size.x - rect.width();
     let y_expand = size.y - rect.height();

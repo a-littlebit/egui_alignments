@@ -2,6 +2,10 @@
 
 All notable changes to this crate will be documented in this file.
 
+## 0.2.4
+
+- Fix: column containers appear at incorrect position when overflowing
+
 ## 0.2.3 - 2024-09-30
 
 - Add `container` module with container `Row` and `Column`

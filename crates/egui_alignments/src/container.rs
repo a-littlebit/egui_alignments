@@ -26,7 +26,7 @@ pub use row::*;
 
 use egui::{Id, InnerResponse, Layout, Sense, Ui, UiBuilder, Vec2};
 
-use crate::expand_layout_rect;
+use crate::resize_layout_rect;
 
 pub(crate) struct Container {
     pub(crate) id: Option<Id>,
@@ -65,11 +65,8 @@ impl Container {
                 desired_size
                     .max(self.min_size)
                     .min(self.max_size)
-                    // limit to available size or growable widgets
-                    // like `ScrollArea` will never shrink
-                    .min(ui.available_size())
             );
-            let expanded_rect = expand_layout_rect(next_rect, available_rect.size(), &self.layout);
+            let expanded_rect = resize_layout_rect(next_rect, available_rect.size(), &self.layout);
             expanded_rect - self.padding
         };
 
