@@ -2,6 +2,10 @@
 
 All notable changes to this crate will be documented in this file.
 
+## 0.2.5
+
+- Update egui to 0.30.0
+
 ## 0.2.4
 
 - Fix: column containers appear at incorrect position when overflowing
