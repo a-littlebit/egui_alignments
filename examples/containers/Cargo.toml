@@ -5,7 +5,7 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-eframe = "0.30.0"
-egui = "0.30.0"
-egui_alignments = { path = "../../crates/egui_alignments" }
-egui_extras = { version = "0.30.0", features = ["all_loaders"] }
+eframe = { workspace = true }
+egui = { workspace = true }
+egui_alignments = { workspace = true }
+egui_extras = { workspace = true }
