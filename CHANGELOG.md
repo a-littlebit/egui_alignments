@@ -2,6 +2,10 @@
 
 All notable changes to this crate will be documented in this file.
 
+## 0.2.7
+
+- Update egui to 0.31.1
+
 ## 0.2.6
 
 - Update egui to 0.31.0

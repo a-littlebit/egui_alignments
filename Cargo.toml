@@ -8,7 +8,7 @@ version = "0.2.6"
 edition = "2021"
 
 [workspace.dependencies]
-eframe = "0.31.0"
-egui = "0.31.0"
+eframe = "0.31.1"
+egui = "0.31.1"
 egui_alignments = { path = "crates/egui_alignments" }
-egui_extras = { version = "0.31.0", features = ["all_loaders"] }
+egui_extras = { version = "0.31.1", features = ["all_loaders"] }
