@@ -1,4 +1,6 @@
-use egui::{Align, Align2, Id, InnerResponse, Layout, Margin, Pos2, Rect, Sense, Ui, UiBuilder, Vec2};
+use egui::{
+    Align, Align2, Id, InnerResponse, Layout, Margin, Pos2, Rect, Sense, Ui, UiBuilder, Vec2,
+};
 
 use crate::resize_layout_rect;
 
@@ -17,7 +19,9 @@ impl Alignment for egui::Align2 {
 }
 
 impl<T> Alignment for T
-where T: FnOnce(Vec2, Rect) -> Rect {
+where
+    T: FnOnce(Vec2, Rect) -> Rect,
+{
     fn align(self, item_size: Vec2, bounds: Rect) -> Rect {
         self(item_size, bounds)
     }
@@ -28,7 +32,7 @@ where T: FnOnce(Vec2, Rect) -> Rect {
 pub enum AllocateType {
     /// Allocate no space.
     None,
-    
+
     /// Allocate only the space allocated by the contents
     Content,
 
@@ -70,11 +74,11 @@ impl Bounds {
 
 /// A container which aligns its contents
 /// within the given alignment and bounds.
-/// 
+///
 /// # Example
 /// ```
 /// use egui_alignments::Aligner;
-/// 
+///
 /// # egui::__run_test_ui(|ui| {
 /// Aligner::center()
 ///     .show(ui, |ui| {
@@ -241,7 +245,7 @@ impl<T: Alignment> Aligner<T> {
     pub fn show<R>(
         self,
         ui: &mut Ui,
-        add_contents: impl FnOnce(&mut egui::Ui) -> R
+        add_contents: impl FnOnce(&mut egui::Ui) -> R,
     ) -> InnerResponse<R> {
         let id = self.id.unwrap_or_else(|| {
             let id = ui.next_auto_id();
@@ -258,37 +262,27 @@ impl<T: Alignment> Aligner<T> {
                 ui.new_child(UiBuilder::new())
                     .allocate_space(size.min(ui.available_size()))
                     .1
-            },
-            Bounds::MaxRect(margin) => {
-                ui.max_rect() - margin
             }
+            Bounds::MaxRect(margin) => ui.max_rect() - margin,
         };
 
         // try to read content size from context memory
         // if not found, use the whole available rect to draw the contents
         let mut memorized = true;
-        let content_size = ui.ctx()
-            .data(|r| r.get_temp(id))
-            .unwrap_or_else(|| {
-                memorized = false;
-                bounds.size()
-            });
+        let content_size = ui.ctx().data(|r| r.get_temp(id)).unwrap_or_else(|| {
+            memorized = false;
+            bounds.size()
+        });
 
         // get the expected rect
         let expected_rect = self.align.align(content_size, bounds);
         // expand to allow content grow
-        let content_rect = resize_layout_rect(
-            expected_rect,
-            bounds.size(),
-            &layout
-        );
-        
+        let content_rect = resize_layout_rect(expected_rect, bounds.size(), &layout);
+
         // create child ui
         let mut child_ui = ui.new_child({
-            let builder = UiBuilder::new()
-                .max_rect(content_rect)
-                .layout(layout);
-            
+            let builder = UiBuilder::new().max_rect(content_rect).layout(layout);
+
             if memorized {
                 builder
             } else {
@@ -300,11 +294,15 @@ impl<T: Alignment> Aligner<T> {
 
         // paint the contents
         let inner = add_contents(&mut child_ui);
-        
+
         // allocate space and get response
         // when already arranged, even if the content has grown, we allocate the expected size
         // if we allocate the whole new rect, it's actually in the wrong place and could disrupt the layout
-        let content_rect = if memorized { expected_rect } else { content_rect };
+        let content_rect = if memorized {
+            expected_rect
+        } else {
+            content_rect
+        };
         let response = ui.allocate_rect(
             match self.allocate_type {
                 AllocateType::None => Rect::from_min_size(ui.next_widget_position(), Vec2::ZERO),
@@ -313,12 +311,12 @@ impl<T: Alignment> Aligner<T> {
                     let min = Pos2::new(bounds.left(), content_rect.top());
                     let max = Pos2::new(bounds.right(), content_rect.bottom());
                     Rect::from_min_max(min, max)
-                },
+                }
                 AllocateType::ContentColumn => {
                     let min = Pos2::new(content_rect.left(), bounds.top());
                     let max = Pos2::new(content_rect.right(), bounds.bottom());
                     Rect::from_min_max(min, max)
-                },
+                }
                 AllocateType::Bounds => bounds,
             },
             Sense::hover(),
@@ -338,7 +336,7 @@ impl<T: Alignment> Aligner<T> {
     pub fn show_horizontal<R>(
         self,
         ui: &mut Ui,
-        add_contents: impl FnOnce(&mut Ui) -> R
+        add_contents: impl FnOnce(&mut Ui) -> R,
     ) -> InnerResponse<R> {
         let layout = if ui.layout().prefer_right_to_left() {
             Layout::right_to_left(Align::Center)
@@ -346,17 +344,16 @@ impl<T: Alignment> Aligner<T> {
             Layout::left_to_right(Align::Center)
         }
         .with_main_wrap(false);
-    
-        self.layout(layout)
-            .show(ui, add_contents)
+
+        self.layout(layout).show(ui, add_contents)
     }
 
     #[inline]
     /// Show the contents horizontally and wrap them when necessary.
     pub fn show_horizontal_wrapped<R>(
-        self, 
-        ui: &mut Ui, 
-        add_contents: impl FnOnce(&mut Ui) -> R
+        self,
+        ui: &mut Ui,
+        add_contents: impl FnOnce(&mut Ui) -> R,
     ) -> InnerResponse<R> {
         let layout = if ui.layout().prefer_right_to_left() {
             Layout::right_to_left(Align::Center)
@@ -365,8 +362,7 @@ impl<T: Alignment> Aligner<T> {
         }
         .with_main_wrap(true);
 
-        self.layout(layout)
-            .show(ui, add_contents)
+        self.layout(layout).show(ui, add_contents)
     }
 
     #[inline]
@@ -374,12 +370,11 @@ impl<T: Alignment> Aligner<T> {
     pub fn show_vertical<R>(
         self,
         ui: &mut Ui,
-        add_contents: impl FnOnce(&mut Ui) -> R
+        add_contents: impl FnOnce(&mut Ui) -> R,
     ) -> InnerResponse<R> {
         let layout = Layout::top_down(Align::Center);
 
-        self.layout(layout)
-            .show(ui, add_contents)
+        self.layout(layout).show(ui, add_contents)
     }
 }
 
@@ -387,7 +382,7 @@ impl<T: Alignment> Aligner<T> {
 /// Center the contents horizontally.
 pub fn center_horizontal<R>(
     ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
+    add_contents: impl FnOnce(&mut Ui) -> R,
 ) -> InnerResponse<R> {
     let layout = if ui.layout().prefer_right_to_left() {
         Layout::right_to_left(Align::Center)
@@ -395,16 +390,14 @@ pub fn center_horizontal<R>(
         Layout::left_to_right(Align::Center)
     };
 
-    Aligner::center()
-        .layout(layout)
-        .show(ui, add_contents)
+    Aligner::center().layout(layout).show(ui, add_contents)
 }
 
 #[inline]
 /// Center the contents horizontally and wrap them when necessary.
 pub fn center_horizontal_wrapped<R>(
     ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
+    add_contents: impl FnOnce(&mut Ui) -> R,
 ) -> InnerResponse<R> {
     let layout = if ui.layout().prefer_right_to_left() {
         Layout::right_to_left(Align::Center)
@@ -413,16 +406,14 @@ pub fn center_horizontal_wrapped<R>(
     }
     .with_main_wrap(true);
 
-    Aligner::center()
-        .layout(layout)
-        .show(ui, add_contents)
+    Aligner::center().layout(layout).show(ui, add_contents)
 }
 
 #[inline]
 /// Center the contents vertically.
 pub fn center_vertical<R>(
     ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
+    add_contents: impl FnOnce(&mut Ui) -> R,
 ) -> InnerResponse<R> {
     Aligner::center()
         .layout(Layout::top_down(Align::Center))
@@ -431,10 +422,7 @@ pub fn center_vertical<R>(
 
 #[inline]
 /// Align the contents to the top horizontally.
-pub fn top_horizontal<R>(
-    ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
-) -> InnerResponse<R> {
+pub fn top_horizontal<R>(ui: &mut Ui, add_contents: impl FnOnce(&mut Ui) -> R) -> InnerResponse<R> {
     let layout = if ui.layout().prefer_right_to_left() {
         Layout::right_to_left(Align::TOP)
     } else {
@@ -450,7 +438,7 @@ pub fn top_horizontal<R>(
 /// Align the contents to the top horizontally and wrap them when necessary.
 pub fn top_horizontal_wrapped<R>(
     ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
+    add_contents: impl FnOnce(&mut Ui) -> R,
 ) -> InnerResponse<R> {
     let layout = if ui.layout().prefer_right_to_left() {
         Layout::right_to_left(Align::TOP)
@@ -466,10 +454,7 @@ pub fn top_horizontal_wrapped<R>(
 
 #[inline]
 /// Align the contents to the top vertically.
-pub fn top_vertical<R>(
-    ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
-) -> InnerResponse<R> {
+pub fn top_vertical<R>(ui: &mut Ui, add_contents: impl FnOnce(&mut Ui) -> R) -> InnerResponse<R> {
     ui.vertical_centered(add_contents)
 }
 
@@ -477,14 +462,14 @@ pub fn top_vertical<R>(
 /// Align the contents to the bottom horizontally.
 pub fn bottom_horizontal<R>(
     ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
+    add_contents: impl FnOnce(&mut Ui) -> R,
 ) -> InnerResponse<R> {
     let layout = if ui.layout().prefer_right_to_left() {
         Layout::right_to_left(Align::BOTTOM)
     } else {
         Layout::left_to_right(Align::BOTTOM)
     };
-    
+
     Aligner::from_align(egui::Align2::CENTER_BOTTOM)
         .layout(layout)
         .show(ui, add_contents)
@@ -494,7 +479,7 @@ pub fn bottom_horizontal<R>(
 /// Align the contents to the bottom horizontally and wrap them when necessary.
 pub fn bottom_horizontal_wrapped<R>(
     ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
+    add_contents: impl FnOnce(&mut Ui) -> R,
 ) -> InnerResponse<R> {
     let layout = if ui.layout().prefer_right_to_left() {
         Layout::right_to_left(Align::BOTTOM)
@@ -512,7 +497,7 @@ pub fn bottom_horizontal_wrapped<R>(
 /// Align the contents to the bottom vertically.
 pub fn bottom_vertical<R>(
     ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
+    add_contents: impl FnOnce(&mut Ui) -> R,
 ) -> InnerResponse<R> {
     ui.with_layout(Layout::bottom_up(Align::Center), add_contents)
 }
@@ -521,7 +506,7 @@ pub fn bottom_vertical<R>(
 /// Align the contents to the left horizontally.
 pub fn left_horizontal<R>(
     ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
+    add_contents: impl FnOnce(&mut Ui) -> R,
 ) -> InnerResponse<R> {
     ui.horizontal_centered(add_contents)
 }
@@ -530,11 +515,10 @@ pub fn left_horizontal<R>(
 /// Align the contents to the left horizontally and wrap them when necessary.
 pub fn left_horizontal_wrapped<R>(
     ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
+    add_contents: impl FnOnce(&mut Ui) -> R,
 ) -> InnerResponse<R> {
-    let layout = Layout::left_to_right(Align::Center)
-        .with_main_wrap(true);
-    
+    let layout = Layout::left_to_right(Align::Center).with_main_wrap(true);
+
     Aligner::from_align(egui::Align2::LEFT_CENTER)
         .layout(layout)
         .show(ui, add_contents)
@@ -542,10 +526,7 @@ pub fn left_horizontal_wrapped<R>(
 
 #[inline]
 /// Align the contents to the left vertically.
-pub fn left_vertical<R>(
-    ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
-) -> InnerResponse<R> {
+pub fn left_vertical<R>(ui: &mut Ui, add_contents: impl FnOnce(&mut Ui) -> R) -> InnerResponse<R> {
     Aligner::from_align(egui::Align2::LEFT_CENTER)
         .layout(Layout::top_down(Align::Min))
         .show(ui, add_contents)
@@ -555,7 +536,7 @@ pub fn left_vertical<R>(
 /// Align the contents to the right horizontally.
 pub fn right_horizontal<R>(
     ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
+    add_contents: impl FnOnce(&mut Ui) -> R,
 ) -> InnerResponse<R> {
     ui.with_layout(Layout::right_to_left(Align::Center), add_contents)
 }
@@ -564,10 +545,9 @@ pub fn right_horizontal<R>(
 /// Align the contents to the right horizontally and wrap them when necessary.
 pub fn right_horizontal_wrapped<R>(
     ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
+    add_contents: impl FnOnce(&mut Ui) -> R,
 ) -> InnerResponse<R> {
-    let layout = Layout::right_to_left(Align::Center)
-        .with_main_wrap(true);
+    let layout = Layout::right_to_left(Align::Center).with_main_wrap(true);
     Aligner::from_align(Align2::RIGHT_CENTER)
         .layout(layout)
         .show(ui, add_contents)
@@ -575,10 +555,7 @@ pub fn right_horizontal_wrapped<R>(
 
 #[inline]
 /// Align the contents to the right vertically.
-pub fn right_vertical<R>(
-    ui: &mut Ui,
-    add_contents: impl FnOnce(&mut Ui) -> R
-) -> InnerResponse<R> {
+pub fn right_vertical<R>(ui: &mut Ui, add_contents: impl FnOnce(&mut Ui) -> R) -> InnerResponse<R> {
     Aligner::from_align(Align2::RIGHT_CENTER)
         .layout(Layout::top_down(Align::Max))
         .show(ui, add_contents)

@@ -5,12 +5,12 @@ use crate::*;
 /// A widget that can adjust its position using an [`Alignment`]
 /// or a widget aligns its itself using the specified [`Alignment`]
 /// before rendering.
-/// 
+///
 /// # Examples
 /// ```
 /// use egui::{Button, Label};
 /// use egui_alignments::Alignable;
-/// 
+///
 /// # egui::__run_test_ui(|ui| {
 /// Label::new("This label will be shown at the top")
 ///     .top(ui);
@@ -77,8 +77,6 @@ pub trait Alignable: Widget + Sized {
 /// by adjust their positions using [`Aligner`].
 impl<T: Widget> Alignable for T {
     fn align(self, ui: &mut Ui, align: impl Alignment) -> Response {
-        Aligner::from_align(align)
-            .show(ui, |ui| self.ui(ui))
-            .inner
+        Aligner::from_align(align).show(ui, |ui| self.ui(ui)).inner
     }
 }

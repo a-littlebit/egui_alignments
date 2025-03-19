@@ -2,6 +2,12 @@
 
 All notable changes to this crate will be documented in this file.
 
+## 0.3.2 - 2025-03-19
+
+- Added `stretch` feature to align items in a container more flexibly.
+
+- P.S. Where is 0.3.0? Actually 0.3.0 has been published on crates.io, but it seems I failed to push the related commits to GitHub. The has led to a version confusion. Anyway, 0.3.2 will be the latest version before 0.3.3 or 0.4.0 with interesting new features compared to 0.2.x and is compatible with later version of `egui` compared to 0.3.0. I'm sorry for the inconvenience. Just try 0.3.2!
+
 ## 0.2.7
 
 - Update egui to 0.31.1

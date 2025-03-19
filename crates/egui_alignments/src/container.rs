@@ -1,10 +1,10 @@
 //! Simple layout containers
-//! 
+//!
 //! # Example
 //! ```
 //! use egui::Align;
 //! use egui_alignments::{column, row};
-//! 
+//!
 //! # egui::__run_test_ui(|ui| {
 //! column(ui, Align::Center, |ui| {
 //!     ui.label("top");
@@ -86,8 +86,12 @@ impl Container {
         self.min_size = min_size;
         self
     }
-    
-    pub fn show<R>(&self, ui: &mut Ui, add_contents: impl FnOnce(&mut Ui) -> R) -> InnerResponse<R> {
+
+    pub fn show<R>(
+        &self,
+        ui: &mut Ui,
+        add_contents: impl FnOnce(&mut Ui) -> R,
+    ) -> InnerResponse<R> {
         // used to memorize content size
         let id = self.id.unwrap_or_else(|| {
             let id = ui.next_auto_id();
@@ -99,35 +103,34 @@ impl Container {
         // if not cached, start a sizing pass
         let mut sizing_pass = false;
         let available_rect = ui.available_rect_before_wrap();
-        let desired_size = ui.ctx().data_mut(|data| {
-            data.get_temp(id)
-        })
-        .unwrap_or_else(|| {
-            sizing_pass = true;
-            // the current pass is a sizing pass, request a rendering pass
-            ui.ctx().request_discard("new Container");
-            available_rect.size()
-        });
+        let desired_size = ui
+            .ctx()
+            .data_mut(|data| data.get_temp(id))
+            .unwrap_or_else(|| {
+                sizing_pass = true;
+                // the current pass is a sizing pass, request a rendering pass
+                ui.ctx().request_discard("new Container");
+                available_rect.size()
+            });
 
         // get the expected content rect
-        let (_, expected_rect) = ui.new_child(UiBuilder::new()).allocate_space(
-            desired_size
-                .max(self.min_size)
-                .min(self.max_size)
-        );
-        let content_rect = resize_layout_rect(expected_rect, available_rect.size(), &self.layout) - self.padding;
+        let (_, expected_rect) = ui
+            .new_child(UiBuilder::new())
+            .allocate_space(desired_size.max(self.min_size).min(self.max_size));
+        let content_rect =
+            resize_layout_rect(expected_rect, available_rect.size(), &self.layout) - self.padding;
 
         // create child ui
         let mut content_ui = ui.new_child({
-            let builder = UiBuilder::new()
-                .max_rect(content_rect);
-            
+            let builder = UiBuilder::new().max_rect(content_rect);
+
             if sizing_pass {
-                builder.layout(
+                builder
+                    .layout(
                         // in sizing pass, keep the layout size minimum
                         self.layout
                             .with_cross_align(egui::Align::Min)
-                            .with_cross_justify(false)
+                            .with_cross_justify(false),
                     )
                     .sizing_pass()
                     .invisible()
@@ -156,7 +159,7 @@ impl Container {
         // if we allocate the whole new rect, it's actually in the wrong place and could disrupt the layout
         let response = ui.allocate_rect(
             if sizing_pass { new_rect } else { expected_rect },
-            Sense::hover()
+            Sense::hover(),
         );
 
         // finish stretch
@@ -164,12 +167,11 @@ impl Container {
 
         // cache content size
         if sizing_pass || new_rect.size() != desired_size {
-            ui.ctx().data_mut(|data| {
-                data.insert_temp(id, new_rect.size())
-            });
+            ui.ctx()
+                .data_mut(|data| data.insert_temp(id, new_rect.size()));
         }
 
-        InnerResponse { inner, response, }
+        InnerResponse { inner, response }
     }
 }
 
@@ -180,20 +182,16 @@ pub(crate) fn register_stretch(ui: &mut Ui, weight: f32) -> Option<f32> {
     if weight <= 0.0 {
         return None;
     }
-    
+
     let space_id = ui.unique_id().with(STRETCH_SPACE_ID_SALT);
     let weight_id = ui.unique_id().with(STRETCH_WEIGHT_ID_SALT);
 
-    let spaces: Vec<f32> = ui.data(|data| {
-        data.get_temp(space_id)
-    })?;
-    let mut weights: Vec<f32> = ui.data(|data| {
-        data.get_temp(weight_id)
-    })?;
-    
+    let spaces: Vec<f32> = ui.data(|data| data.get_temp(space_id))?;
+    let mut weights: Vec<f32> = ui.data(|data| data.get_temp(weight_id))?;
+
     // calculate index based on the number of registered stretches
     let index = weights.len();
-    
+
     // register weight of self
     weights.push(weight);
     ui.data_mut(|data| {
@@ -206,9 +204,12 @@ pub(crate) fn register_stretch(ui: &mut Ui, weight: f32) -> Option<f32> {
 fn prepare_stretch(ui: &mut Ui, available_space: f32) -> Option<Vec<f32>> {
     let space_id = ui.unique_id().with(STRETCH_SPACE_ID_SALT);
     let weight_id = ui.unique_id().with(STRETCH_WEIGHT_ID_SALT);
-    
+
     let (Some(last_spaces), Some(last_weights)) = ui.data(|data| {
-        (data.get_temp::<Vec<f32>>(space_id), data.get_temp::<Vec<f32>>(weight_id))
+        (
+            data.get_temp::<Vec<f32>>(space_id),
+            data.get_temp::<Vec<f32>>(weight_id),
+        )
     }) else {
         ui.data_mut(|data| {
             data.insert_temp(space_id, Vec::<f32>::new());
@@ -237,14 +238,14 @@ fn prepare_stretch(ui: &mut Ui, available_space: f32) -> Option<Vec<f32>> {
 
 fn finish_stretch(ui: &mut Ui, last_weights: Option<Vec<f32>>) {
     let weight_id = ui.unique_id().with(STRETCH_WEIGHT_ID_SALT);
-    
-    let Some(last_weights) = last_weights else { return };
-    
+
+    let Some(last_weights) = last_weights else {
+        return;
+    };
+
     // release data and check if the weights changed
-    let Some(new_weights) = ui.data(|r| {
-        r.get_temp::<Vec<f32>>(weight_id)
-    }) else {
-        return
+    let Some(new_weights) = ui.data(|r| r.get_temp::<Vec<f32>>(weight_id)) else {
+        return;
     };
 
     // request another pass if the weights changed
@@ -254,7 +255,7 @@ fn finish_stretch(ui: &mut Ui, last_weights: Option<Vec<f32>>) {
 }
 
 /// Stretch the available space with the given weight. Only available in a container.
-/// 
+///
 /// # Example
 /// ```rust
 /// use egui::Align;
@@ -287,20 +288,20 @@ pub fn stretch_with_weight(ui: &mut Ui, weight: f32) -> f32 {
 /// Stretch the available space. Only available in a container.
 /// If there are multiple stretches in a container, they will share the available space in average.
 /// If you want to have stretches with different sizes in a container, use [`stretch_with_weight`] instead.
-/// 
- /// # Example
- /// ```rust
- /// use egui::Align;
- /// use egui_alignments::{column, stretch};
- ///
- /// # egui::__run_test_ui(|ui| {
- /// column(ui, Align::Center, |ui| {
- ///     ui.label("Top");
- ///     stretch(ui);
- ///     ui.label("Bottom");
- /// });
- /// # });
- /// ```
+///
+/// # Example
+/// ```rust
+/// use egui::Align;
+/// use egui_alignments::{column, stretch};
+///
+/// # egui::__run_test_ui(|ui| {
+/// column(ui, Align::Center, |ui| {
+///     ui.label("Top");
+///     stretch(ui);
+///     ui.label("Bottom");
+/// });
+/// # });
+/// ```
 
 pub fn stretch(ui: &mut Ui) -> f32 {
     stretch_with_weight(ui, 1.0)

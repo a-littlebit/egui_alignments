@@ -8,7 +8,7 @@ Simple alignment tools for egui
 
 ```rust
 use egui::{Button, Label};
-use egui_alignments::AlignedWidget;
+use egui_alignments::Alignable;
 
 Label::new("This label will be shown at the top")
     .top(ui);
@@ -77,15 +77,70 @@ use egui_alignments::{center_horizontal, column, row};
 center_horizontal(ui, |ui| {
     ui.image("path/to/left/image");
     column(ui, Align::Center, |ui| {
-        ui.label("top of right text");
+        ui.label("top of text right to image");
         row(ui, Align::Center, |ui| {
             ui.label("left");
             ui.label("middle");
             ui.label("right");
         });
-        ui.label("bottom of right text");
+        ui.label("bottom of text right to image");
     });
 });
 ```
 
 This will show an image on the left, and a column of text on the right which contains a row of three labels in the middle.
+
+### Use stretches in containers
+
+Sometimes you may not want the elements in a container to be closely aligned.
+You may use `stretch` to make the elements in a container stretch to fill the available space.
+
+```rust
+use egui::Align;
+use egui_alignments::{center_horizontal, column, row};
+
+center_horizontal(ui, |ui| {
+    ui.image("path/to/left/image");
+    column(ui, Align::Center, |ui| {
+        ui.label("top of text right to image");
+        stretch(ui);
+        row(ui, Align::Center, |ui| {
+            ui.label("left");
+            stretch(ui);
+            ui.label("middle");
+            stretch(ui);
+            ui.label("right");
+        });
+        stretch(ui);
+        ui.label("bottom of text right to image");
+    });
+});
+```
+
+This will make the text elements right to the image aligned as far as possible.
+
+If you want the stretches in a container to have different weights, you may use `stretch_with_weight` instead.
+
+```rust
+use egui::Align;
+use egui_alignments::{center_horizontal, column, row};
+
+center_horizontal(ui, |ui| {
+    stretch_with_weight(ui, 2.0);
+    ui.image("path/to/left/image");
+    stretch_with_weight(ui, 1.0);
+    column(ui, Align::Center, |ui| {
+        ui.label("top of text right to image");
+        row(ui, Align::Center, |ui| {
+            ui.label("left");
+            ui.label("middle");
+            ui.label("right");
+        });
+        ui.label("bottom of text right to image");
+    });
+    stretch_with_weight(ui, 2.0);
+});
+```
+
+This will make the space left to the image and right to all the text elements
+to be twice as large as the gap between the image and the text.

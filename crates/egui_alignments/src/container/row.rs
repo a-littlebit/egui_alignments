@@ -26,7 +26,7 @@ pub struct Row {
 
     /// The maximum height of the row.
     pub max_height: f32,
-    
+
     /// The minimum height of the row.
     pub min_height: f32,
 }
@@ -45,14 +45,14 @@ impl Row {
             min_height: 0.0,
         }
     }
-    
+
     #[inline]
     /// Set the id of the row.
     pub fn id(mut self, id: Id) -> Self {
         self.id = Some(id);
         self
     }
-    
+
     #[inline]
     /// Set the vertical alignment of the row items.
     pub fn valign(mut self, align: Align) -> Self {
@@ -97,7 +97,11 @@ impl Default for Row {
 
 impl Row {
     /// Show the row in the given ui.
-    pub fn show<R>(&self, ui: &mut Ui, add_contents: impl FnOnce(&mut Ui) -> R) -> InnerResponse<R> {
+    pub fn show<R>(
+        &self,
+        ui: &mut Ui,
+        add_contents: impl FnOnce(&mut Ui) -> R,
+    ) -> InnerResponse<R> {
         let Self {
             id,
             valign,
@@ -107,7 +111,9 @@ impl Row {
             ..
         } = *self;
 
-        let right_to_left = self.right_to_left.unwrap_or(ui.layout().prefer_right_to_left());
+        let right_to_left = self
+            .right_to_left
+            .unwrap_or(ui.layout().prefer_right_to_left());
 
         let layout = if right_to_left {
             Layout::right_to_left(valign)
@@ -129,7 +135,7 @@ impl Row {
 
 #[inline]
 /// Create a new row
-/// 
+///
 /// # Example
 /// ```rust
 /// use egui::Align;

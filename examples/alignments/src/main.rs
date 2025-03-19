@@ -40,7 +40,7 @@ impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             Label::new(WidgetText::from("My egui Application").heading()).top(ui);
-            
+
             top_horizontal(ui, |ui| {
                 let name_label = ui.label("Your name: ");
 
@@ -51,15 +51,15 @@ impl eframe::App for MyApp {
                 ui.text_edit_singleline(&mut self.name)
                     .labelled_by(name_label.id);
             });
-            
-            egui::Slider::new(&mut self.age, 0..=120).text("age").top(ui);
+
+            egui::Slider::new(&mut self.age, 0..=120)
+                .text("age")
+                .top(ui);
             Label::new(format!("Hello '{}', age {}", self.name, self.age)).top(ui);
 
-            Image::new(egui::include_image!(
-                "../../assets/ferris.png"
-            ))
-            .fit_to_exact_size(vec2(200.0, 200.0))
-            .center(ui);
+            Image::new(egui::include_image!("../../assets/ferris.png"))
+                .fit_to_exact_size(vec2(200.0, 200.0))
+                .center(ui);
         });
     }
 }

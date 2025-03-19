@@ -13,7 +13,7 @@ pub struct Column {
 
     /// The horizontal alignment of the column items.
     pub halign: Align,
-    
+
     /// The padding of the column items.
     pub padding: Margin,
 
@@ -24,7 +24,7 @@ pub struct Column {
 
     /// The maximum width of the column.
     pub max_width: f32,
-    
+
     /// The minimum width of the column.
     pub min_width: f32,
 }
@@ -42,14 +42,14 @@ impl Column {
             min_width: 0.0,
         }
     }
-    
+
     #[inline]
     /// Set the id of the column.
     pub fn id(mut self, id: Id) -> Self {
         self.id = Some(id);
         self
     }
-    
+
     #[inline]
     /// Set the horizontal alignment of the column items.
     pub fn halign(mut self, align: Align) -> Self {
@@ -102,7 +102,11 @@ impl Default for Column {
 
 impl Column {
     /// Show the column in the given ui.
-    pub fn show<R>(&self, ui: &mut Ui, add_contents: impl FnOnce(&mut Ui) -> R) -> InnerResponse<R> {
+    pub fn show<R>(
+        &self,
+        ui: &mut Ui,
+        add_contents: impl FnOnce(&mut Ui) -> R,
+    ) -> InnerResponse<R> {
         let Self {
             id,
             halign,
@@ -111,7 +115,7 @@ impl Column {
             min_width,
             ..
         } = *self;
-        
+
         let layout = if self.bottom_up {
             Layout::bottom_up(halign)
         } else {
@@ -131,7 +135,7 @@ impl Column {
 
 #[inline]
 /// Create a new column
-/// 
+///
 /// # Example
 /// ```rust
 /// use egui::Align;
@@ -145,6 +149,10 @@ impl Column {
 /// });
 /// # });
 /// ```
-pub fn column<R>(ui: &mut Ui, halign: Align, add_contents: impl FnOnce(&mut Ui) -> R) -> InnerResponse<R> {
+pub fn column<R>(
+    ui: &mut Ui,
+    halign: Align,
+    add_contents: impl FnOnce(&mut Ui) -> R,
+) -> InnerResponse<R> {
     Column::new(halign).show(ui, add_contents)
 }

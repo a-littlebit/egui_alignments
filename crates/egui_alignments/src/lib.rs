@@ -37,7 +37,7 @@
 //!
 //! # egui::__run_test_ui(|ui| {
 //! let mut clicked_button = None;
-//! 
+//!
 //! center_vertical(ui, |ui| {
 //!     ui.label("Click a button");
 //!
@@ -62,7 +62,7 @@
 //! });
 //! # });
 //! ```
-//! 
+//!
 //! ### Use containers
 //!
 //! Sometimes nested calls to alignment functions like `center_horizontal`, `top_vertical`, ...
@@ -95,7 +95,7 @@
 //! ```
 //!
 //! This will show an image on the left, and a column of text on the right which contains a row of three labels in the middle.
-//! 
+//!
 //! ### Use stretches
 //!
 //! Sometimes you may want to make a widget stretch to fill the remaining space
@@ -156,11 +156,11 @@ pub(crate) fn resize_layout_rect(rect: Rect, size: Vec2, layout: &Layout) -> Rec
         Direction::TopDown => (layout.cross_align, Align::Min),
         Direction::BottomUp => (layout.cross_align, Align::Max),
     };
-    
+
     match halign {
         Align::Min => {
             new_rect.max.x += x_expand;
-        },
+        }
         Align::Center => {
             // if the layout always allocate the full width even if it doesn't need that much
             // then we should not expand the rect
@@ -168,7 +168,7 @@ pub(crate) fn resize_layout_rect(rect: Rect, size: Vec2, layout: &Layout) -> Rec
                 new_rect.min.x -= x_expand / 2.0;
                 new_rect.max.x += x_expand / 2.0;
             }
-        },
+        }
         Align::Max => {
             new_rect.min.x -= x_expand;
         }
@@ -177,7 +177,7 @@ pub(crate) fn resize_layout_rect(rect: Rect, size: Vec2, layout: &Layout) -> Rec
     match valign {
         Align::Min => {
             new_rect.max.y += y_expand;
-        },
+        }
         Align::Center => {
             // if the layout always allocate the full height even if it doesn't need that much
             // then we should not expand the rect
@@ -185,7 +185,7 @@ pub(crate) fn resize_layout_rect(rect: Rect, size: Vec2, layout: &Layout) -> Rec
                 new_rect.min.y -= y_expand / 2.0;
                 new_rect.max.y += y_expand / 2.0;
             }
-        },
+        }
         Align::Max => {
             new_rect.min.y -= y_expand;
         }

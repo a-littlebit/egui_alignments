@@ -40,7 +40,7 @@ impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.spacing_mut().item_spacing = vec2(6.0, 12.0);
-            
+
             ui.centered_and_justified(|ui| {
                 column(ui, egui::Align::Center, |ui| {
                     stretch_with_weight(ui, 2.0);
@@ -48,7 +48,7 @@ impl eframe::App for MyApp {
                     ui.heading("My egui Application");
 
                     stretch(ui);
-            
+
                     row(ui, egui::Align::Center, |ui| {
                         let name_label = ui.label("Your name: ");
 
@@ -67,15 +67,15 @@ impl eframe::App for MyApp {
                     });
 
                     stretch(ui);
-                    
-                    egui::Slider::new(&mut self.age, 0..=120).text("age").top(ui);
+
+                    egui::Slider::new(&mut self.age, 0..=120)
+                        .text("age")
+                        .top(ui);
                     ui.label(format!("Hello '{}', age {}", self.name, self.age));
 
                     stretch(ui);
 
-                    ui.image(egui::include_image!(
-                        "../../assets/ferris.png"
-                    ));
+                    ui.image(egui::include_image!("../../assets/ferris.png"));
 
                     stretch_with_weight(ui, 2.0);
                 });
