@@ -3,7 +3,7 @@
 
 use eframe::egui;
 use egui::{vec2, Image, Label, WidgetText};
-use egui_alignments::{top_horizontal, AlignedWidget};
+use egui_alignments::{top_horizontal, Alignable};
 
 fn main() -> eframe::Result {
     let options = eframe::NativeOptions {

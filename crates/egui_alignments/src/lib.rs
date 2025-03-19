@@ -8,7 +8,7 @@
 //!
 //! ```rust
 //! use egui::{Button, Label};
-//! use egui_alignments::AlignedWidget;
+//! use egui_alignments::Alignable;
 //!
 //! # egui::__run_test_ui(|ui| {
 //! Label::new("This label will be shown at the top")
@@ -95,12 +95,49 @@
 //! ```
 //!
 //! This will show an image on the left, and a column of text on the right which contains a row of three labels in the middle.
+//! 
+//! ### Use stretches
+//!
+//! Sometimes you may want to make a widget stretch to fill the remaining space
+//! between widgets instead of besides them in a container.
+//!
+//! Use `stretch` to achieve this.
+//!
+//! ```rust
+//! use egui::Align;
+//! use egui_alignments::{column, stretch};
+//!
+//! # egui::__run_test_ui(|ui| {
+//! column(ui, Align::Center, |ui| {
+//!     ui.label("Top");
+//!     stretch(ui);
+//!     ui.label("Bottom");
+//! });
+//! # });
+//! ```
+//!
+//! If you want to have stretches with different sizes, you may use `stretch_with_weight`.
+//!
+//! ```rust
+//! use egui::Align;
+//! use egui_alignments::{column, stretch_with_weight};
+//!
+//! # egui::__run_test_ui(|ui| {
+//! column(ui, Align::Center, |ui| {
+//!     ui.label("100% height");
+//!     stretch_with_weight(ui, 1.0);
+//!     ui.label("75% height");
+//!     stretch_with_weight(ui, 3.0);
+//!     ui.label("0% height");
+//! });
+//! # });
+//! ```
 
-pub mod aligned_widget;
+pub mod alignable;
 pub mod aligner;
 pub mod container;
 
-pub use aligned_widget::*;
+pub use alignable::*;
 pub use aligner::*;
 pub use container::*;
 

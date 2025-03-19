@@ -5,25 +5,25 @@ use crate::resize_layout_rect;
 /// Represents an alignment strategy.
 /// You can directly use `egui::Align2` or closure `FnOnce(egui::Vec2, egui::Rect) -> egui::Rect`
 /// to align the contents.
-/// Or you can implement your own aligner.
-pub trait Aligner {
+/// Or you can implement your own alignment.
+pub trait Alignment {
     fn align(self, item_size: Vec2, bounds: Rect) -> Rect;
 }
 
-impl Aligner for egui::Align2 {
+impl Alignment for egui::Align2 {
     fn align(self, item_size: Vec2, bounds: Rect) -> Rect {
         self.align_size_within_rect(item_size, bounds)
     }
 }
 
-impl<T> Aligner for T
+impl<T> Alignment for T
 where T: FnOnce(Vec2, Rect) -> Rect {
     fn align(self, item_size: Vec2, bounds: Rect) -> Rect {
         self(item_size, bounds)
     }
 }
 
-/// Determines how [`WidgetAligner`] allocate space for the aligned contents.
+/// Determines how [`Aligner`] allocate space for the aligned contents.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum AllocateType {
     /// Allocate no space.
@@ -69,26 +69,26 @@ impl Bounds {
 }
 
 /// A container which aligns its contents
-/// within the given aligner and bounds.
+/// within the given alignment and bounds.
 /// 
 /// # Example
 /// ```
-/// use egui_alignments::WidgetAligner;
+/// use egui_alignments::Aligner;
 /// 
 /// # egui::__run_test_ui(|ui| {
-/// WidgetAligner::center()
+/// Aligner::center()
 ///     .show(ui, |ui| {
 ///         ui.label("This label will be shown at the center");
 ///     });
 /// # });
 /// ```
-pub struct WidgetAligner<T: Aligner> {
+pub struct Aligner<T: Alignment> {
     /// Used to memorize content size.
     /// If not set, the id will be generated automatically.
     pub id: Option<Id>,
 
-    /// The aligner.
-    /// Could be a `egui::Align2`, a closure or a custom aligner.
+    /// The alignment.
+    /// Could be a `egui::Align2`, a closure or a custom [`Alignment`].
     pub align: T,
 
     /// The bounds in which its contents will be aligned.
@@ -103,9 +103,7 @@ pub struct WidgetAligner<T: Aligner> {
     pub layout: Option<Layout>,
 }
 
-pub type Align2WidgetAligner = WidgetAligner<egui::Align2>;
-
-impl Default for Align2WidgetAligner {
+impl Default for Aligner<Align2> {
     fn default() -> Self {
         Self {
             id: None,
@@ -117,74 +115,74 @@ impl Default for Align2WidgetAligner {
     }
 }
 
-impl Align2WidgetAligner {
+impl Aligner<Align2> {
     #[inline]
-    /// Create an `AlignedWidget`
+    /// Create an `Alignable`
     /// which aligns its contents to the center of all the available space.
     pub fn center() -> Self {
         Self::from_align(Align2::CENTER_CENTER)
     }
 
     #[inline]
-    /// Create an `AlignedWidget`
+    /// Create an `Alignable`
     /// which aligns its contents to the center-bottom of all the available space.
     pub fn center_top() -> Self {
         Self::from_align(Align2::CENTER_TOP)
     }
 
     #[inline]
-    /// Create an `AlignedWidget`
+    /// Create an `Alignable`
     /// which aligns its contents to the center-bottom of all the available space.
     pub fn center_bottom() -> Self {
         Self::from_align(Align2::CENTER_BOTTOM)
     }
 
     #[inline]
-    /// Create an `AlignedWidget`
+    /// Create an `Alignable`
     /// which aligns its contents to the left of the available space.
     pub fn left() -> Self {
         Self::from_align(Align2::LEFT_CENTER)
     }
 
     #[inline]
-    /// Create an `AlignedWidget`
+    /// Create an `Alignable`
     /// which aligns its contents to the left-top of all the available space.
     pub fn left_top() -> Self {
         Self::from_align(Align2::LEFT_TOP)
     }
 
     #[inline]
-    /// Create an `AlignedWidget`
+    /// Create an `Alignable`
     /// which aligns its contents to the left-bottom of all the available space.
     pub fn left_bottom() -> Self {
         Self::from_align(Align2::LEFT_BOTTOM)
     }
 
     #[inline]
-    /// Create an `AlignedWidget`
+    /// Create an `Alignable`
     /// which aligns its contents to the right of the available space.
     pub fn right() -> Self {
         Self::from_align(Align2::RIGHT_CENTER)
     }
 
     #[inline]
-    /// Create an `AlignedWidget`
+    /// Create an `Alignable`
     /// which aligns its contents to the right-top of all the available space.
     pub fn right_top() -> Self {
         Self::from_align(Align2::RIGHT_TOP)
     }
 
     #[inline]
-    /// Create an `AlignedWidget`
+    /// Create an `Alignable`
     /// which aligns its contents to the right-bottom of all the available space.
     pub fn right_bottom() -> Self {
         Self::from_align(Align2::RIGHT_BOTTOM)
     }
 }
 
-impl<T: Aligner> WidgetAligner<T> {
-    /// Create an `AlignedWidget`
-    /// which aligns its contents using the given aligner.
+impl<T: Alignment> Aligner<T> {
+    /// Create an `Alignable`
+    /// which aligns its contents using the given alignment.
     pub fn from_align(align: T) -> Self {
         Self {
             id: None,
@@ -196,7 +194,7 @@ impl<T: Aligner> WidgetAligner<T> {
     }
 }
 
-impl<T: Aligner> WidgetAligner<T> {
+impl<T: Alignment> Aligner<T> {
     #[inline]
     /// Set the id of the aligned widget.
     /// The id is used to memorize the content size.
@@ -207,9 +205,9 @@ impl<T: Aligner> WidgetAligner<T> {
     }
 
     #[inline]
-    /// Set the aligner.
-    /// The aligner is used to align the contents.
-    /// Could be a `egui::Align2`, a closure or a custom aligner.
+    /// Set the alignment.
+    /// The alignment is used to align the contents.
+    /// Could be a `egui::Align2`, a closure or a custom [`Alignment`].
     pub fn align(mut self, align: T) -> Self {
         self.align = align;
         self
@@ -238,7 +236,7 @@ impl<T: Aligner> WidgetAligner<T> {
     }
 }
 
-impl<T: Aligner> WidgetAligner<T> {
+impl<T: Alignment> Aligner<T> {
     /// Show the aligned contents.
     pub fn show<R>(
         self,
@@ -276,9 +274,11 @@ impl<T: Aligner> WidgetAligner<T> {
                 bounds.size()
             });
 
-        // calc the content rect
+        // get the expected rect
+        let expected_rect = self.align.align(content_size, bounds);
+        // expand to allow content grow
         let content_rect = resize_layout_rect(
-            self.align.align(content_size, bounds),
+            expected_rect,
             bounds.size(),
             &layout
         );
@@ -293,7 +293,7 @@ impl<T: Aligner> WidgetAligner<T> {
                 builder
             } else {
                 // no size memorized, set the pass to sizing pass
-                ui.ctx().request_discard("new WidgetAligner");
+                ui.ctx().request_discard("new Aligner");
                 builder.sizing_pass().invisible()
             }
         });
@@ -301,19 +301,20 @@ impl<T: Aligner> WidgetAligner<T> {
         // paint the contents
         let inner = add_contents(&mut child_ui);
         
-        // hold the content place
+        // allocate space and get response
+        // when already arranged, even if the content has grown, we allocate the expected size
+        // if we allocate the whole new rect, it's actually in the wrong place and could disrupt the layout
+        let content_rect = if memorized { expected_rect } else { content_rect };
         let response = ui.allocate_rect(
             match self.allocate_type {
                 AllocateType::None => Rect::from_min_size(ui.next_widget_position(), Vec2::ZERO),
-                AllocateType::Content => child_ui.min_rect(),
+                AllocateType::Content => content_rect,
                 AllocateType::ContentRow => {
-                    let content_rect = child_ui.min_rect();
                     let min = Pos2::new(bounds.left(), content_rect.top());
                     let max = Pos2::new(bounds.right(), content_rect.bottom());
                     Rect::from_min_max(min, max)
                 },
                 AllocateType::ContentColumn => {
-                    let content_rect = child_ui.min_rect();
                     let min = Pos2::new(content_rect.left(), bounds.top());
                     let max = Pos2::new(content_rect.right(), bounds.bottom());
                     Rect::from_min_max(min, max)
@@ -394,7 +395,7 @@ pub fn center_horizontal<R>(
         Layout::left_to_right(Align::Center)
     };
 
-    WidgetAligner::center()
+    Aligner::center()
         .layout(layout)
         .show(ui, add_contents)
 }
@@ -412,7 +413,7 @@ pub fn center_horizontal_wrapped<R>(
     }
     .with_main_wrap(true);
 
-    WidgetAligner::center()
+    Aligner::center()
         .layout(layout)
         .show(ui, add_contents)
 }
@@ -423,7 +424,7 @@ pub fn center_vertical<R>(
     ui: &mut Ui,
     add_contents: impl FnOnce(&mut Ui) -> R
 ) -> InnerResponse<R> {
-    WidgetAligner::center()
+    Aligner::center()
         .layout(Layout::top_down(Align::Center))
         .show(ui, add_contents)
 }
@@ -440,7 +441,7 @@ pub fn top_horizontal<R>(
         Layout::left_to_right(Align::TOP)
     };
 
-    WidgetAligner::from_align(egui::Align2::CENTER_TOP)
+    Aligner::from_align(egui::Align2::CENTER_TOP)
         .layout(layout)
         .show(ui, add_contents)
 }
@@ -458,7 +459,7 @@ pub fn top_horizontal_wrapped<R>(
     }
     .with_main_wrap(true);
 
-    WidgetAligner::from_align(Align2::CENTER_TOP)
+    Aligner::from_align(Align2::CENTER_TOP)
         .layout(layout)
         .show(ui, add_contents)
 }
@@ -484,7 +485,7 @@ pub fn bottom_horizontal<R>(
         Layout::left_to_right(Align::BOTTOM)
     };
     
-    WidgetAligner::from_align(egui::Align2::CENTER_BOTTOM)
+    Aligner::from_align(egui::Align2::CENTER_BOTTOM)
         .layout(layout)
         .show(ui, add_contents)
 }
@@ -502,7 +503,7 @@ pub fn bottom_horizontal_wrapped<R>(
     }
     .with_main_wrap(true);
 
-    WidgetAligner::from_align(egui::Align2::CENTER_BOTTOM)
+    Aligner::from_align(egui::Align2::CENTER_BOTTOM)
         .layout(layout)
         .show(ui, add_contents)
 }
@@ -534,7 +535,7 @@ pub fn left_horizontal_wrapped<R>(
     let layout = Layout::left_to_right(Align::Center)
         .with_main_wrap(true);
     
-    WidgetAligner::from_align(egui::Align2::LEFT_CENTER)
+    Aligner::from_align(egui::Align2::LEFT_CENTER)
         .layout(layout)
         .show(ui, add_contents)
 }
@@ -545,7 +546,7 @@ pub fn left_vertical<R>(
     ui: &mut Ui,
     add_contents: impl FnOnce(&mut Ui) -> R
 ) -> InnerResponse<R> {
-    WidgetAligner::from_align(egui::Align2::LEFT_CENTER)
+    Aligner::from_align(egui::Align2::LEFT_CENTER)
         .layout(Layout::top_down(Align::Min))
         .show(ui, add_contents)
 }
@@ -567,7 +568,7 @@ pub fn right_horizontal_wrapped<R>(
 ) -> InnerResponse<R> {
     let layout = Layout::right_to_left(Align::Center)
         .with_main_wrap(true);
-    WidgetAligner::from_align(Align2::RIGHT_CENTER)
+    Aligner::from_align(Align2::RIGHT_CENTER)
         .layout(layout)
         .show(ui, add_contents)
 }
@@ -578,7 +579,7 @@ pub fn right_vertical<R>(
     ui: &mut Ui,
     add_contents: impl FnOnce(&mut Ui) -> R
 ) -> InnerResponse<R> {
-    WidgetAligner::from_align(Align2::RIGHT_CENTER)
+    Aligner::from_align(Align2::RIGHT_CENTER)
         .layout(Layout::top_down(Align::Max))
         .show(ui, add_contents)
 }

@@ -2,14 +2,14 @@ use egui::{Align2, Response, Ui, Widget};
 
 use crate::*;
 
-/// A widget that can adjust its position using an [`Aligner`]
-/// or a widget aligns its itself using the specified [`Aligner`]
+/// A widget that can adjust its position using an [`Alignment`]
+/// or a widget aligns its itself using the specified [`Alignment`]
 /// before rendering.
 /// 
 /// # Examples
 /// ```
 /// use egui::{Button, Label};
-/// use egui_alignments::AlignedWidget;
+/// use egui_alignments::Alignable;
 /// 
 /// # egui::__run_test_ui(|ui| {
 /// Label::new("This label will be shown at the top")
@@ -23,9 +23,9 @@ use crate::*;
 ///     .bottom(ui);
 /// # });
 /// ```
-pub trait AlignedWidget: Widget + Sized {
-    /// Show the widget at the position specified by the [`Aligner`].
-    fn align(self, ui: &mut Ui, align: impl Aligner) -> Response;
+pub trait Alignable: Widget + Sized {
+    /// Show the widget at the position specified by the [`Alignment`].
+    fn align(self, ui: &mut Ui, align: impl Alignment) -> Response;
 
     /// Show the widget at the center of the available space.
     fn center(self, ui: &mut Ui) -> Response {
@@ -73,11 +73,11 @@ pub trait AlignedWidget: Widget + Sized {
     }
 }
 
-/// Implements [`AlignedWidget`] for all [`Widget`]s
-/// by adjust their positions using [`WidgetAligner`].
-impl<T: Widget> AlignedWidget for T {
-    fn align(self, ui: &mut Ui, align: impl Aligner) -> Response {
-        WidgetAligner::from_align(align)
+/// Implements [`Alignable`] for all [`Widget`]s
+/// by adjust their positions using [`Aligner`].
+impl<T: Widget> Alignable for T {
+    fn align(self, ui: &mut Ui, align: impl Alignment) -> Response {
+        Aligner::from_align(align)
             .show(ui, |ui| self.ui(ui))
             .inner
     }
