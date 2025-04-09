@@ -103,7 +103,9 @@ impl Container {
         // if not cached, start a sizing pass
         let mut sizing_pass = false;
         // make sure available_rect shrinks when screen rect is shrinking
-        let available_rect = ui.available_rect_before_wrap().intersect(ui.ctx().screen_rect());
+        let available_rect = ui
+            .available_rect_before_wrap()
+            .intersect(ui.ctx().screen_rect());
         let desired_size = ui
             .ctx()
             .data_mut(|data| data.get_temp(id))
@@ -174,6 +176,7 @@ impl Container {
 
 const STRETCH_SPACE_ID_SALT: &'static str = "egui_alignments::container::STRETCH_SPACE_ID_SALT";
 const STRETCH_WEIGHT_ID_SALT: &'static str = "egui_alignments::container::STRETCH_WEIGHT_ID_SALT";
+const STRETCH_WRAPPED_ID_SALT: &'static str = "egui_alignments::container::STRETCH_WRAPPED_ID_SALT";
 
 pub(crate) fn register_stretch(ui: &mut Ui, weight: f32) -> Option<f32> {
     if weight <= 0.0 {
@@ -201,6 +204,7 @@ pub(crate) fn register_stretch(ui: &mut Ui, weight: f32) -> Option<f32> {
 fn prepare_stretch(ui: &mut Ui, available_space: f32) -> Option<Vec<f32>> {
     let space_id = ui.unique_id().with(STRETCH_SPACE_ID_SALT);
     let weight_id = ui.unique_id().with(STRETCH_WEIGHT_ID_SALT);
+    let wrapped_id = ui.unique_id().with(STRETCH_WRAPPED_ID_SALT);
 
     let (Some(last_spaces), Some(last_weights)) = ui.data(|data| {
         (
@@ -214,7 +218,12 @@ fn prepare_stretch(ui: &mut Ui, available_space: f32) -> Option<Vec<f32>> {
         });
         return None;
     };
-    let available_space = (available_space + last_spaces.iter().sum::<f32>()).max(0.0);
+    let mut available_space = (available_space + last_spaces.iter().sum::<f32>()).max(0.0);
+    let wrapped = ui.data(|data| data.get_temp::<bool>(wrapped_id).unwrap_or(false));
+    if wrapped {
+        // if the layout is wrapped, we consider that there is no space left
+        available_space = 0.0;
+    }
     let last_weights_sum: f32 = last_weights.iter().sum();
 
     // calculate sizes
@@ -235,6 +244,7 @@ fn prepare_stretch(ui: &mut Ui, available_space: f32) -> Option<Vec<f32>> {
 
 fn finish_stretch(ui: &mut Ui, last_weights: Option<Vec<f32>>) {
     let weight_id = ui.unique_id().with(STRETCH_WEIGHT_ID_SALT);
+    let wrapped_id = ui.unique_id().with(STRETCH_WRAPPED_ID_SALT);
 
     let Some(last_weights) = last_weights else {
         return;
@@ -244,6 +254,19 @@ fn finish_stretch(ui: &mut Ui, last_weights: Option<Vec<f32>>) {
     let Some(new_weights) = ui.data(|r| r.get_temp::<Vec<f32>>(weight_id)) else {
         return;
     };
+
+    // check if the layout is wrapped
+    let mut wrapped = false;
+    if ui.layout().main_wrap {
+        wrapped = if ui.layout().is_horizontal() {
+            ui.cursor().top() > ui.min_rect().top()
+        } else {
+            ui.cursor().left() > ui.min_rect().left()
+        };
+    }
+    ui.data_mut(|data| {
+        data.insert_temp(wrapped_id, wrapped);
+    });
 
     // request another pass if the weights changed
     if last_weights != new_weights {

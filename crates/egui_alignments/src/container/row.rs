@@ -75,6 +75,13 @@ impl Row {
     }
 
     #[inline]
+    /// Set the wrapping mode of the row.
+    pub fn wrapping(mut self, wrapping: bool) -> Self {
+        self.wrapping = wrapping;
+        self
+    }
+
+    #[inline]
     /// Set the maximum height of the row.
     pub fn max_height(mut self, max_height: f32) -> Self {
         self.max_height = max_height;
@@ -117,11 +124,7 @@ impl Row {
 
         // If wrapping is enabled, Align::Center or Align::Max will cause the row to take up
         // the full height of the ui.
-        let valign = if self.wrapping {
-            Align::Min
-        } else {
-            valign
-        };
+        let valign = if self.wrapping { Align::Min } else { valign };
         let layout = if right_to_left {
             Layout::right_to_left(valign)
         } else {

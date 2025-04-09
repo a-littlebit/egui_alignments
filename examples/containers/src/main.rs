@@ -2,8 +2,8 @@
 #![allow(rustdoc::missing_crate_level_docs)] // it's an example
 
 use eframe::egui;
-use egui::vec2;
-use egui_alignments::{column, row, stretch, stretch_with_weight, Alignable};
+use egui::{vec2, Label, Widget};
+use egui_alignments::{column, row, stretch, stretch_with_weight, Alignable, Row};
 
 fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
@@ -49,9 +49,21 @@ impl eframe::App for MyApp {
 
                     stretch(ui);
 
-                    row(ui, egui::Align::Center, |ui| {
-                        let name_label = ui.label("Your name: ");
+                    let edit_row = Row::new(egui::Align::Min).wrapping(true);
+                    edit_row.show(ui, |ui| {
+                        let name_label = Label::new("Your name: ")
+                            .wrap_mode(egui::TextWrapMode::Extend)
+                            .ui(ui);
 
+                        stretch(ui);
+
+                        ui.text_edit_singleline(&mut self.name)
+                            .labelled_by(name_label.id);
+                    });
+
+                    stretch(ui);
+
+                    row(ui, egui::Align::Min, |ui| {
                         column(ui, egui::Align::Center, |ui| {
                             ui.spacing_mut().item_spacing.y = 6.0;
                             if ui.button("Increment").clicked() {
@@ -62,15 +74,13 @@ impl eframe::App for MyApp {
                             }
                         });
 
-                        ui.text_edit_singleline(&mut self.name)
-                            .labelled_by(name_label.id);
+                        row(ui, egui::Align::Center, |ui| {
+                            egui::Slider::new(&mut self.age, 0..=120)
+                                .text("age")
+                                .top(ui);
+                        });
                     });
 
-                    stretch(ui);
-
-                    egui::Slider::new(&mut self.age, 0..=120)
-                        .text("age")
-                        .top(ui);
                     ui.label(format!("Hello '{}', age {}", self.name, self.age));
 
                     stretch(ui);
