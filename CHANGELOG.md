@@ -2,6 +2,10 @@
 
 All notable changes to this crate will be documented in this file.
 
+## 0.3.4 - 2025-04-10
+
+- Fixed: Wrapped layouts with stretch never unwrapping. [#7](https://github.com/a-littlebit/egui_alignments/issues/7)
+
 ## 0.3.3 - 2025-04-09
 
 - Fixed: a wrapping row can take up full available height. [#6](https://github.com/a-littlebit/egui_alignments/issues/6)
