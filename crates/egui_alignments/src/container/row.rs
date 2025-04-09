@@ -115,6 +115,13 @@ impl Row {
             .right_to_left
             .unwrap_or(ui.layout().prefer_right_to_left());
 
+        // If wrapping is enabled, Align::Center or Align::Max will cause the row to take up
+        // the full height of the ui.
+        let valign = if self.wrapping {
+            Align::Min
+        } else {
+            valign
+        };
         let layout = if right_to_left {
             Layout::right_to_left(valign)
         } else {

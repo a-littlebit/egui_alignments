@@ -102,7 +102,8 @@ impl Container {
         // try to get content size from cache
         // if not cached, start a sizing pass
         let mut sizing_pass = false;
-        let available_rect = ui.available_rect_before_wrap();
+        // make sure available_rect shrinks when screen rect is shrinking
+        let available_rect = ui.available_rect_before_wrap().intersect(ui.ctx().screen_rect());
         let desired_size = ui
             .ctx()
             .data_mut(|data| data.get_temp(id))
@@ -140,14 +141,10 @@ impl Container {
         });
 
         // prepare data for stretch
-        let stretch_space = {
-            // make sure available_rect shrinks when screen rect is shrinking
-            let available_rect = available_rect.intersect(ui.ctx().screen_rect());
-            if self.layout.is_horizontal() {
-                available_rect.width() - desired_size.x
-            } else {
-                available_rect.height() - desired_size.y
-            }
+        let stretch_space = if self.layout.is_horizontal() {
+            available_rect.width() - desired_size.x
+        } else {
+            available_rect.height() - desired_size.y
         };
         let last_weights = prepare_stretch(&mut content_ui, stretch_space);
 
