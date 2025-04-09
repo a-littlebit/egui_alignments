@@ -1,6 +1,6 @@
 # egui_alignments
 
-Simple alignment tools for egui
+Simple alignment tools for [egui](https://github.com/emilk/egui)
 
 ## Example Usage
 

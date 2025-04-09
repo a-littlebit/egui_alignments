@@ -131,7 +131,7 @@ dependencies = [
 
 [[package]]
 name = "alignments"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "eframe",
  "egui",
@@ -665,7 +665,7 @@ dependencies = [
 
 [[package]]
 name = "containers"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "eframe",
  "egui",
@@ -930,7 +930,7 @@ dependencies = [
 
 [[package]]
 name = "egui_alignments"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "egui",
 ]

@@ -2,6 +2,10 @@
 
 All notable changes to this crate will be documented in this file.
 
+## 0.3.3 - 2025-04-09
+
+- Fixed: a wrapping row can take up full available height. [#6](https://github.com/a-littlebit/egui_alignments/issues/6)
+
 ## 0.3.2 - 2025-03-19
 
 - Added `stretch` feature to align items in a container more flexibly.
