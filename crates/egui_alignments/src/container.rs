@@ -105,7 +105,7 @@ impl Container {
         // make sure available_rect shrinks when screen rect is shrinking
         let available_rect = ui
             .available_rect_before_wrap()
-            .intersect(ui.ctx().screen_rect());
+            .intersect(ui.ctx().content_rect());
         let desired_size = ui
             .ctx()
             .data_mut(|data| data.get_temp(id))
