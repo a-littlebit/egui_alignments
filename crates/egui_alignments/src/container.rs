@@ -24,9 +24,9 @@ pub mod row;
 pub use column::*;
 pub use row::*;
 
-use egui::{Id, InnerResponse, Layout, Sense, Ui, UiBuilder, Vec2};
-
 use crate::resize_layout_rect;
+use egui::emath::GuiRounding;
+use egui::{Id, InnerResponse, Layout, Sense, Ui, UiBuilder, Vec2};
 
 pub struct Container {
     pub id: Option<Id>,
@@ -224,13 +224,22 @@ fn prepare_stretch(ui: &mut Ui, available_space: f32) -> Option<Vec<f32>> {
         // if the layout is wrapped, we consider that there is no space left
         available_space = 0.0;
     }
-    let last_weights_sum: f32 = last_weights.iter().sum();
+    let total_weight: f32 = last_weights.iter().sum();
 
     // calculate sizes
+    let mut cumulative_weight = 0.0;
+    let mut cumulative_rounded = 0.0;
     let mut spaces = Vec::with_capacity(last_weights.len());
     for weight in last_weights.iter() {
-        let space = available_space * weight / last_weights_sum;
-        spaces.push(space);
+        // egui rounds lengths given to add_space (and in general) using round_ui(). The
+        // individually rounded spaces will not necessarily add up to the same as the original
+        // available_space. Therefore, keep track of the accumulated error to ensure that the
+        // rounded spaces will average out to the original total.
+        cumulative_weight += weight;
+        let cumulative_space = available_space * (cumulative_weight / total_weight);
+        let rounded = cumulative_space.round_ui() - cumulative_rounded;
+        cumulative_rounded += rounded;
+        spaces.push(rounded);
     }
 
     // prepare data for stretch
