@@ -4,7 +4,7 @@ members = ["crates/egui_alignments", "examples/alignments", "examples/containers
 
 [workspace.package]
 license = "MIT OR Apache-2.0"
-version = "0.3.6"
+version = "0.3.7"
 edition = "2021"
 
 [workspace.dependencies]
