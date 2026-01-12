@@ -129,7 +129,7 @@ dependencies = [
 
 [[package]]
 name = "alignments"
-version = "0.3.5"
+version = "0.3.6"
 dependencies = [
  "eframe",
  "egui",
@@ -189,7 +189,7 @@ dependencies = [
  "objc2-foundation 0.3.2",
  "parking_lot",
  "percent-encoding",
- "windows-sys 0.59.0",
+ "windows-sys 0.60.2",
  "x11rb",
 ]
 
@@ -624,7 +624,7 @@ dependencies = [
 
 [[package]]
 name = "containers"
-version = "0.3.5"
+version = "0.3.6"
 dependencies = [
  "eframe",
  "egui",
@@ -890,9 +890,10 @@ dependencies = [
 
 [[package]]
 name = "egui_alignments"
-version = "0.3.5"
+version = "0.3.6"
 dependencies = [
  "egui",
+ "egui_kittest",
 ]
 
 [[package]]
@@ -927,6 +928,16 @@ dependencies = [
  "wasm-bindgen",
  "web-sys",
  "winit",
+]
+
+[[package]]
+name = "egui_kittest"
+version = "0.33.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a0ca7eb7521658cb9714724de1de199be864a1eafe29218ecd5b22db2f4f8400"
+dependencies = [
+ "egui",
+ "kittest",
 ]
 
 [[package]]
@@ -1640,7 +1651,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4b0f83760fb341a774ed326568e19f5a863af4a952def8c39f9ab92fd95b88e5"
 dependencies = [
  "equivalent",
- "hashbrown 0.15.2",
+ "hashbrown 0.16.0",
 ]
 
 [[package]]
@@ -1700,6 +1711,17 @@ name = "khronos_api"
 version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
+
+[[package]]
+name = "kittest"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "01fd6dd2cce251a360101038acb9334e3a50cd38cd02fefddbf28aa975f043c8"
+dependencies = [
+ "accesskit",
+ "accesskit_consumer",
+ "parking_lot",
+]
 
 [[package]]
 name = "kurbo"
@@ -2704,7 +2726,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.11.0",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
