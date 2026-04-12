@@ -2,6 +2,10 @@
 
 All notable changes to this crate will be documented in this file.
 
+## 0.3.8 - 2026-04-12
+
+- Update egui to 0.34.0
+
 ## 0.3.4 - 2025-04-10
 
 - Fixed: Wrapped layouts with stretch never unwrapping. [#7](https://github.com/a-littlebit/egui_alignments/issues/7)
