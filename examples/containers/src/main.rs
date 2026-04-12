@@ -1,8 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 #![allow(rustdoc::missing_crate_level_docs)] // it's an example
 
-use eframe::egui;
-use egui::{vec2, Label, Widget};
+use eframe::{egui, Frame};
+use egui::{vec2, Label, Ui, Widget};
 use egui_alignments::{column, row, stretch, stretch_with_weight, Alignable, Row};
 
 fn main() -> eframe::Result {
@@ -37,8 +37,8 @@ impl Default for MyApp {
 }
 
 impl eframe::App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
+    fn ui(&mut self, ui: &mut Ui, _frame: &mut Frame) {
+        egui::CentralPanel::default().show_inside(ui, |ui| {
             ui.spacing_mut().item_spacing = vec2(6.0, 12.0);
 
             ui.centered_and_justified(|ui| {

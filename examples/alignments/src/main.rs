@@ -1,8 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 #![allow(rustdoc::missing_crate_level_docs)] // it's an example
 
-use eframe::egui;
-use egui::{vec2, Image, Label, WidgetText};
+use eframe::{egui, Frame};
+use egui::{vec2, Image, Label, Ui, WidgetText};
 use egui_alignments::{top_horizontal, Alignable};
 
 fn main() -> eframe::Result {
@@ -37,8 +37,8 @@ impl Default for MyApp {
 }
 
 impl eframe::App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
+    fn ui(&mut self, ui: &mut Ui, _frame: &mut Frame) {
+        egui::CentralPanel::default().show_inside(ui, |ui| {
             Label::new(WidgetText::from("My egui Application").heading()).top(ui);
 
             top_horizontal(ui, |ui| {
