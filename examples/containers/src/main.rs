@@ -38,7 +38,7 @@ impl Default for MyApp {
 
 impl eframe::App for MyApp {
     fn ui(&mut self, ui: &mut Ui, _frame: &mut Frame) {
-        egui::CentralPanel::default().show_inside(ui, |ui| {
+        egui::CentralPanel::default().show(ui, |ui| {
             ui.spacing_mut().item_spacing = vec2(6.0, 12.0);
 
             ui.centered_and_justified(|ui| {

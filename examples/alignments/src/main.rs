@@ -38,7 +38,7 @@ impl Default for MyApp {
 
 impl eframe::App for MyApp {
     fn ui(&mut self, ui: &mut Ui, _frame: &mut Frame) {
-        egui::CentralPanel::default().show_inside(ui, |ui| {
+        egui::CentralPanel::default().show(ui, |ui| {
             Label::new(WidgetText::from("My egui Application").heading()).top(ui);
 
             top_horizontal(ui, |ui| {
