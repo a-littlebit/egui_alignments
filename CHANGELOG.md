@@ -2,6 +2,11 @@
 
 All notable changes to this crate will be documented in this file.
 
+## 0.3.9 - 2026-9-3
+
+- Update egui to 0.36.1
+
+
 ## Unreleased
 
 - Update egui to 0.35.0

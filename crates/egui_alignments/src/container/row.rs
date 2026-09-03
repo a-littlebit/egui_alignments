@@ -1,5 +1,3 @@
-use std::f32::INFINITY;
-
 use egui::{vec2, Align, Id, InnerResponse, Layout, Margin, Ui};
 
 use super::Container;
@@ -41,7 +39,7 @@ impl Row {
             padding: Margin::ZERO,
             right_to_left: None,
             wrapping: false,
-            max_height: INFINITY,
+            max_height: f32::INFINITY,
             min_height: 0.0,
         }
     }
@@ -136,7 +134,7 @@ impl Row {
             id,
             layout,
             padding,
-            max_size: vec2(INFINITY, max_height),
+            max_size: vec2(f32::INFINITY, max_height),
             min_size: vec2(0.0, min_height),
         }
         .show(ui, add_contents)
