@@ -4,12 +4,12 @@ members = ["crates/egui_alignments", "examples/alignments", "examples/containers
 
 [workspace.package]
 license = "MIT OR Apache-2.0"
-version = "0.3.8"
+version = "0.3.9"
 edition = "2021"
 
 [workspace.dependencies]
-eframe = "0.35"
-egui = "0.35"
+eframe = "0.36.1"
+egui = "0.36.1"
 egui_alignments = { path = "crates/egui_alignments" }
-egui_extras = { version = "0.35", features = ["all_loaders"] }
-egui_kittest = "0.35"
+egui_extras = { version = "0.36.1", features = ["all_loaders"] }
+egui_kittest = "0.36.1"

@@ -1,5 +1,3 @@
-use std::f32::INFINITY;
-
 use egui::{vec2, Align, Id, InnerResponse, Layout, Margin, Ui};
 
 use super::Container;
@@ -38,7 +36,7 @@ impl Column {
             halign,
             padding: Margin::ZERO,
             bottom_up: false,
-            max_width: INFINITY,
+            max_width: f32::INFINITY,
             min_width: 0.0,
         }
     }
@@ -126,7 +124,7 @@ impl Column {
             id,
             layout,
             padding,
-            max_size: vec2(max_width, INFINITY),
+            max_size: vec2(max_width, f32::INFINITY),
             min_size: vec2(min_width, 0.0),
         }
         .show(ui, add_contents)

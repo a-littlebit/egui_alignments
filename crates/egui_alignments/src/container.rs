@@ -174,8 +174,11 @@ impl Container {
     }
 }
 
+#[allow(clippy::redundant_static_lifetimes)]
 const STRETCH_SPACE_ID_SALT: &'static str = "egui_alignments::container::STRETCH_SPACE_ID_SALT";
+#[allow(clippy::redundant_static_lifetimes)]
 const STRETCH_WEIGHT_ID_SALT: &'static str = "egui_alignments::container::STRETCH_WEIGHT_ID_SALT";
+#[allow(clippy::redundant_static_lifetimes)]
 const STRETCH_WRAPPED_ID_SALT: &'static str = "egui_alignments::container::STRETCH_WRAPPED_ID_SALT";
 
 pub(crate) fn register_stretch(ui: &mut Ui, weight: f32) -> Option<f32> {
@@ -331,7 +334,6 @@ pub fn stretch_with_weight(ui: &mut Ui, weight: f32) -> f32 {
 /// });
 /// # });
 /// ```
-
 pub fn stretch(ui: &mut Ui) -> f32 {
     stretch_with_weight(ui, 1.0)
 }
