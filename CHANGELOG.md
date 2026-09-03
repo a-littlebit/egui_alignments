@@ -6,11 +6,6 @@ All notable changes to this crate will be documented in this file.
 
 - Update egui to 0.36.1
 
-
-## Unreleased
-
-- Update egui to 0.35.0
-
 ## 0.3.8 - 2026-04-12
 
 - Update egui to 0.34.0
